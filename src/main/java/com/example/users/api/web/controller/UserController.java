@@ -5,6 +5,7 @@ import com.example.users.api.web.dto.UserCreationDto;
 import com.example.users.api.web.dto.UserDto;
 import com.example.users.api.web.dto.UserUpdateDto;
 import com.example.users.api.web.mapper.UserMapper;
+import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -46,14 +47,14 @@ public class UserController {
   }
 
   @PostMapping
-  public ResponseEntity<UserDto> create(@RequestBody UserCreationDto userDto) {
+  public ResponseEntity<UserDto> create(@RequestBody @Valid UserCreationDto userDto) {
     var newUser = userService.create(userMapper.toEntity(userDto));
     return new ResponseEntity<>(userMapper.toPayload(newUser), HttpStatus.CREATED);
   }
 
   @PatchMapping("/{id}")
   public ResponseEntity<UserDto> partialUpdate(@PathVariable Long id,
-                                               @RequestBody UserUpdateDto userDto) {
+                                               @RequestBody @Valid UserUpdateDto userDto) {
     return ResponseEntity.of(userService.findById(id)
         .map(user -> userMapper.partialUpdate(userDto, user))
         .map(userService::update)
