@@ -12,7 +12,6 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper
 public interface UserMapper {
-
   @Mapping(target = "birthDate", source = "birthDate", dateFormat = "dd-MM-yyyy")
   UserDto toPayload(User user);
 

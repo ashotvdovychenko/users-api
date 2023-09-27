@@ -33,8 +33,8 @@ public class UserController {
 
   @PostMapping
   public ResponseEntity<UserDto> create(@RequestBody UserCreationDto userDto) {
-        var newUser = userService.create(userMapper.toEntity(userDto));
-        return new ResponseEntity<>(userMapper.toPayload(newUser), HttpStatus.CREATED);
+    var newUser = userService.create(userMapper.toEntity(userDto));
+    return new ResponseEntity<>(userMapper.toPayload(newUser), HttpStatus.CREATED);
   }
 
   @PatchMapping("/{id}")
