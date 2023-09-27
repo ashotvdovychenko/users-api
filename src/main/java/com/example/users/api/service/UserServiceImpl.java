@@ -2,6 +2,8 @@ package com.example.users.api.service;
 
 import com.example.users.api.domain.User;
 import com.example.users.api.repository.UserRepository;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,14 @@ public class UserServiceImpl implements UserService {
   @Override
   public Optional<User> findById(Long id) {
     return userRepository.findById(id);
+  }
+
+  @Override
+  public List<User> findAllByBirthDateRange(LocalDate birthDateFrom, LocalDate birthDateTo) {
+    if (birthDateFrom.isAfter(birthDateTo)) {
+      throw new IllegalArgumentException();
+    }
+    return userRepository.findAllByBirthDateBetween(birthDateFrom, birthDateTo);
   }
 
   @Override
