@@ -4,7 +4,6 @@ import com.example.users.api.domain.User;
 import java.util.Optional;
 
 public interface UserService {
-
   User create(User user);
 
   User updateOne(User updatedUser);
@@ -14,5 +13,4 @@ public interface UserService {
   Optional<User> findByUsername(String username);
 
   void deleteOne(Long id);
-
 }
