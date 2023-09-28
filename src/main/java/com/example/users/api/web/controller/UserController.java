@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -72,6 +73,19 @@ public class UserController {
                                                @RequestBody @Valid UserUpdateDto userDto) {
     return ResponseEntity.of(userService.findById(id)
         .map(user -> userMapper.partialUpdate(userDto, user))
+        .map(userService::update)
+        .map(userMapper::toPayload));
+  }
+
+  @PutMapping("/{id}")
+  @Operation(summary = "Update user fully", responses = {
+      @ApiResponse(responseCode = "200"),
+      @ApiResponse(responseCode = "404", content = @Content)
+  })
+  public ResponseEntity<UserDto> fullUpdate(@PathVariable Long id,
+                                            @RequestBody @Valid UserCreationDto userDto) {
+    return ResponseEntity.of(userService.findById(id)
+        .map(user -> userMapper.fullUpdate(userDto, user))
         .map(userService::update)
         .map(userMapper::toPayload));
   }
