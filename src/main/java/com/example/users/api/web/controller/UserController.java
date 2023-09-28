@@ -13,14 +13,12 @@ import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,7 +35,11 @@ public class UserController {
   private final UserMapper userMapper;
 
   @GetMapping(params = {"birth_date_from", "birth_date_to"})
-  @Operation(summary = "Get all users by birth date range")
+  @Operation(summary = "Get all users by birth date range", responses = {
+      @ApiResponse(responseCode = "200"),
+      @ApiResponse(responseCode = "400", content = @Content),
+      @ApiResponse(responseCode = "403", content = @Content)
+  })
   public ResponseEntity<List<UserDto>> findByBirthDateRange(@RequestParam(name = "birth_date_from")
                                                             LocalDate birthDateFrom,
                                                             @RequestParam(name = "birth_date_to")
@@ -51,22 +53,18 @@ public class UserController {
   @GetMapping("/{id}")
   @Operation(summary = "Get user by id", responses = {
       @ApiResponse(responseCode = "200"),
+      @ApiResponse(responseCode = "403", content = @Content),
       @ApiResponse(responseCode = "404", content = @Content)
   })
   public ResponseEntity<UserDto> findById(@PathVariable Long id) {
     return ResponseEntity.of(userService.findById(id).map(userMapper::toPayload));
   }
 
-  @PostMapping
-  @Operation(summary = "Create user", responses = @ApiResponse(responseCode = "201"))
-  public ResponseEntity<UserDto> create(@RequestBody @Valid UserCreationDto userDto) {
-    var newUser = userService.create(userMapper.toEntity(userDto));
-    return new ResponseEntity<>(userMapper.toPayload(newUser), HttpStatus.CREATED);
-  }
-
   @PatchMapping("/{id}")
   @Operation(summary = "Update user partially", responses = {
       @ApiResponse(responseCode = "200"),
+      @ApiResponse(responseCode = "400", content = @Content),
+      @ApiResponse(responseCode = "403", content = @Content),
       @ApiResponse(responseCode = "404", content = @Content)
   })
   public ResponseEntity<UserDto> partialUpdate(@PathVariable Long id,
@@ -80,6 +78,8 @@ public class UserController {
   @PutMapping("/{id}")
   @Operation(summary = "Update user fully", responses = {
       @ApiResponse(responseCode = "200"),
+      @ApiResponse(responseCode = "400", content = @Content),
+      @ApiResponse(responseCode = "403", content = @Content),
       @ApiResponse(responseCode = "404", content = @Content)
   })
   public ResponseEntity<UserDto> fullUpdate(@PathVariable Long id,
@@ -91,8 +91,10 @@ public class UserController {
   }
 
   @DeleteMapping("/{id}")
-  @Operation(summary = "Delete user by id",
-      responses = @ApiResponse(responseCode = "204", content = @Content))
+  @Operation(summary = "Delete user by id", responses = {
+      @ApiResponse(responseCode = "204", content = @Content),
+      @ApiResponse(responseCode = "403", content = @Content),
+  })
   public ResponseEntity<Void> deleteById(@PathVariable Long id) {
     userService.deleteById(id);
     return ResponseEntity.noContent().build();

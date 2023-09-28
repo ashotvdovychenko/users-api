@@ -1,13 +1,17 @@
 package com.example.users.api.service;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.users.api.domain.User;
 import com.example.users.api.exception.UserAlreadyExistsException;
 import com.example.users.api.repository.UserRepository;
+import com.example.users.api.security.JwtTokenProvider;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
 
   private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
+  private final JwtTokenProvider jwtTokenProvider;
 
   @Value("${min.user.age}")
   private int minAge;
@@ -32,7 +38,16 @@ public class UserServiceImpl implements UserService {
       throw new IllegalArgumentException(
           "Min age must be equal or higher than %d".formatted(minAge));
     }
+    user.setPassword(passwordEncoder.encode(user.getPassword()));
     return userRepository.save(user);
+  }
+
+  @Override
+  public Optional<DecodedJWT> signIn(String username, String password) {
+    if (!existsByCredentials(username, password)) {
+      throw new BadCredentialsException("Invalid username/password supplied");
+    }
+    return jwtTokenProvider.toDecodedJWT(jwtTokenProvider.generateToken(username));
   }
 
   @Override
@@ -80,5 +95,19 @@ public class UserServiceImpl implements UserService {
 
   private boolean isAgeNotAllowed(LocalDate birthDate) {
     return birthDate.isAfter(LocalDate.now().minusYears(minAge));
+  }
+
+  private Optional<User> findByCredentials(String username, String password) {
+    var maybeUser = userRepository.findByUsername(username);
+    if (maybeUser.isPresent()) {
+      if (passwordEncoder.matches(password, maybeUser.get().getPassword())) {
+        return maybeUser;
+      }
+    }
+    return Optional.empty();
+  }
+
+  private boolean existsByCredentials(String username, String password) {
+    return findByCredentials(username, password).isPresent();
   }
 }
