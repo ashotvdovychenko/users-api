@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
   public List<User> findAllByBirthDateRange(LocalDate birthDateFrom, LocalDate birthDateTo) {
     if (birthDateFrom.isAfter(birthDateTo)) {
       throw new IllegalArgumentException(
-          "Date %s must be later than %s".formatted(birthDateTo, birthDateFrom));
+          "Date %s is not later than %s".formatted(birthDateTo, birthDateFrom));
     }
     return userRepository.findAllByBirthDateBetween(birthDateFrom, birthDateTo);
   }
