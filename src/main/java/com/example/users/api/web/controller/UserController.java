@@ -35,7 +35,11 @@ public class UserController {
   private final UserMapper userMapper;
 
   @GetMapping(params = {"birth_date_from", "birth_date_to"})
-  @Operation(summary = "Get all users by birth date range")
+  @Operation(summary = "Get all users by birth date range", responses = {
+      @ApiResponse(responseCode = "200"),
+      @ApiResponse(responseCode = "400", content = @Content),
+      @ApiResponse(responseCode = "403", content = @Content)
+  })
   public ResponseEntity<List<UserDto>> findByBirthDateRange(@RequestParam(name = "birth_date_from")
                                                             LocalDate birthDateFrom,
                                                             @RequestParam(name = "birth_date_to")
@@ -49,6 +53,7 @@ public class UserController {
   @GetMapping("/{id}")
   @Operation(summary = "Get user by id", responses = {
       @ApiResponse(responseCode = "200"),
+      @ApiResponse(responseCode = "403", content = @Content),
       @ApiResponse(responseCode = "404", content = @Content)
   })
   public ResponseEntity<UserDto> findById(@PathVariable Long id) {
@@ -58,6 +63,8 @@ public class UserController {
   @PatchMapping("/{id}")
   @Operation(summary = "Update user partially", responses = {
       @ApiResponse(responseCode = "200"),
+      @ApiResponse(responseCode = "400", content = @Content),
+      @ApiResponse(responseCode = "403", content = @Content),
       @ApiResponse(responseCode = "404", content = @Content)
   })
   public ResponseEntity<UserDto> partialUpdate(@PathVariable Long id,
@@ -71,6 +78,8 @@ public class UserController {
   @PutMapping("/{id}")
   @Operation(summary = "Update user fully", responses = {
       @ApiResponse(responseCode = "200"),
+      @ApiResponse(responseCode = "400", content = @Content),
+      @ApiResponse(responseCode = "403", content = @Content),
       @ApiResponse(responseCode = "404", content = @Content)
   })
   public ResponseEntity<UserDto> fullUpdate(@PathVariable Long id,
@@ -82,8 +91,10 @@ public class UserController {
   }
 
   @DeleteMapping("/{id}")
-  @Operation(summary = "Delete user by id",
-      responses = @ApiResponse(responseCode = "204", content = @Content))
+  @Operation(summary = "Delete user by id", responses = {
+      @ApiResponse(responseCode = "204", content = @Content),
+      @ApiResponse(responseCode = "403", content = @Content),
+  })
   public ResponseEntity<Void> deleteById(@PathVariable Long id) {
     userService.deleteById(id);
     return ResponseEntity.noContent().build();
