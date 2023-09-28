@@ -14,4 +14,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
   List<User> findAllByBirthDateBetween(LocalDate fromDate, LocalDate toDate);
 
   boolean existsByUsername(String username);
+
+  void deleteByUsername(String username);
 }

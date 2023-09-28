@@ -84,8 +84,9 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void deleteById(Long id) {
-    userRepository.deleteById(id);
+  @Transactional
+  public void deleteByUsername(String username) {
+    userRepository.deleteByUsername(username);
   }
 
   private boolean isUsernameInUse(User user) {
