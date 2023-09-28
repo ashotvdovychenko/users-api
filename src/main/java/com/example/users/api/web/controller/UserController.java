@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -60,43 +61,43 @@ public class UserController {
     return ResponseEntity.of(userService.findById(id).map(userMapper::toPayload));
   }
 
-  @PatchMapping("/{id}")
-  @Operation(summary = "Update user partially", responses = {
+  @PatchMapping("/self")
+  @Operation(summary = "Update your user account partially", responses = {
       @ApiResponse(responseCode = "200"),
       @ApiResponse(responseCode = "400", content = @Content),
       @ApiResponse(responseCode = "403", content = @Content),
       @ApiResponse(responseCode = "404", content = @Content)
   })
-  public ResponseEntity<UserDto> partialUpdate(@PathVariable Long id,
-                                               @RequestBody @Valid UserUpdateDto userDto) {
-    return ResponseEntity.of(userService.findById(id)
+  public ResponseEntity<UserDto> partialUpdateSelf(@RequestBody @Valid UserUpdateDto userDto,
+                                                   Principal principal) {
+    return ResponseEntity.of(userService.findByUsername(principal.getName())
         .map(user -> userMapper.partialUpdate(userDto, user))
         .map(userService::update)
         .map(userMapper::toPayload));
   }
 
-  @PutMapping("/{id}")
-  @Operation(summary = "Update user fully", responses = {
+  @PutMapping("/self")
+  @Operation(summary = "Update your user account fully", responses = {
       @ApiResponse(responseCode = "200"),
       @ApiResponse(responseCode = "400", content = @Content),
       @ApiResponse(responseCode = "403", content = @Content),
       @ApiResponse(responseCode = "404", content = @Content)
   })
-  public ResponseEntity<UserDto> fullUpdate(@PathVariable Long id,
-                                            @RequestBody @Valid UserCreationDto userDto) {
-    return ResponseEntity.of(userService.findById(id)
+  public ResponseEntity<UserDto> fullUpdateSelf(@RequestBody @Valid UserCreationDto userDto,
+                                                Principal principal) {
+    return ResponseEntity.of(userService.findByUsername(principal.getName())
         .map(user -> userMapper.fullUpdate(userDto, user))
         .map(userService::update)
         .map(userMapper::toPayload));
   }
 
-  @DeleteMapping("/{id}")
-  @Operation(summary = "Delete user by id", responses = {
+  @DeleteMapping("/self")
+  @Operation(summary = "Delete your user account", responses = {
       @ApiResponse(responseCode = "204", content = @Content),
       @ApiResponse(responseCode = "403", content = @Content),
   })
-  public ResponseEntity<Void> deleteById(@PathVariable Long id) {
-    userService.deleteById(id);
+  public ResponseEntity<Void> deleteSelf(Principal principal) {
+    userService.deleteByUsername(principal.getName());
     return ResponseEntity.noContent().build();
   }
 }
