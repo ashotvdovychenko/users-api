@@ -8,7 +8,9 @@ import com.example.users.api.security.JwtTokenProvider;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,6 +26,8 @@ public class UserServiceImpl implements UserService {
   private final PasswordEncoder passwordEncoder;
   private final JwtTokenProvider jwtTokenProvider;
 
+  @Getter
+  @Setter
   @Value("${min.user.age}")
   private int minAge;
 
@@ -61,6 +65,7 @@ public class UserServiceImpl implements UserService {
       throw new IllegalArgumentException(
           "Min age must be equal or higher than %d".formatted(minAge));
     }
+    updatedUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
     return userRepository.save(updatedUser);
   }
 

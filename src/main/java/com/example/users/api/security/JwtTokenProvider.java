@@ -7,12 +7,15 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
+@NoArgsConstructor
+@AllArgsConstructor
 public class JwtTokenProvider {
-
   @Value("${jwt.secret}")
   private String jwtSecret;
 
