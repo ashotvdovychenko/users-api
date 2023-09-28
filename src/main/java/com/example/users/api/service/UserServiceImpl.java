@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,12 +18,19 @@ public class UserServiceImpl implements UserService {
 
   private final UserRepository userRepository;
 
+  @Value("${min.user.age}")
+  private int minAge;
+
   @Override
   @Transactional
   public User create(User user) {
     if (userRepository.existsByUsername(user.getUsername())) {
       throw new UserAlreadyExistsException(
           "Username %s is already in use".formatted(user.getUsername()));
+    }
+    if (isAgeNotAllowed(user.getBirthDate())) {
+      throw new IllegalArgumentException(
+          "Min age must be equal or higher than %d".formatted(minAge));
     }
     return userRepository.save(user);
   }
@@ -33,6 +41,10 @@ public class UserServiceImpl implements UserService {
     if (isUsernameInUse(updatedUser)) {
       throw new UserAlreadyExistsException(
           "Username %s is already in use".formatted(updatedUser.getUsername()));
+    }
+    if (isAgeNotAllowed(updatedUser.getBirthDate())) {
+      throw new IllegalArgumentException(
+          "Min age must be equal or higher than %d".formatted(minAge));
     }
     return userRepository.save(updatedUser);
   }
@@ -64,5 +76,9 @@ public class UserServiceImpl implements UserService {
   private boolean isUsernameInUse(User user) {
     return userRepository.findByUsername(user.getUsername())
         .filter(found -> !found.getId().equals(user.getId())).isPresent();
+  }
+
+  private boolean isAgeNotAllowed(LocalDate birthDate) {
+    return birthDate.isAfter(LocalDate.now().minusYears(minAge));
   }
 }
