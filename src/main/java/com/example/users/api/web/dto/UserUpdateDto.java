@@ -2,6 +2,7 @@ package com.example.users.api.web.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
@@ -27,6 +28,7 @@ public class UserUpdateDto {
   @Schema(example = "string")
   private String email;
 
+  @Past(message = "Birth date must be a past")
   @Schema(example = "2012-12-12")
   private LocalDate birthDate;
 
