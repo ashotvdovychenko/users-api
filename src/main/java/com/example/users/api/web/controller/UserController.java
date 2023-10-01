@@ -38,8 +38,7 @@ public class UserController {
   @GetMapping(params = {"birth_date_from", "birth_date_to"})
   @Operation(summary = "Get all users by birth date range", responses = {
       @ApiResponse(responseCode = "200"),
-      @ApiResponse(responseCode = "400", content = @Content),
-      @ApiResponse(responseCode = "403", content = @Content)
+      @ApiResponse(responseCode = "400", content = @Content)
   })
   public ResponseEntity<List<UserDto>> findByBirthDateRange(@RequestParam(name = "birth_date_from")
                                                             LocalDate birthDateFrom,
@@ -54,7 +53,6 @@ public class UserController {
   @GetMapping("/{id}")
   @Operation(summary = "Get user by id", responses = {
       @ApiResponse(responseCode = "200"),
-      @ApiResponse(responseCode = "403", content = @Content),
       @ApiResponse(responseCode = "404", content = @Content)
   })
   public ResponseEntity<UserDto> findById(@PathVariable Long id) {
@@ -65,7 +63,6 @@ public class UserController {
   @Operation(summary = "Update your user account partially", responses = {
       @ApiResponse(responseCode = "200"),
       @ApiResponse(responseCode = "400", content = @Content),
-      @ApiResponse(responseCode = "403", content = @Content),
       @ApiResponse(responseCode = "404", content = @Content)
   })
   public ResponseEntity<UserDto> partialUpdateSelf(@RequestBody @Valid UserUpdateDto userDto,
@@ -80,7 +77,6 @@ public class UserController {
   @Operation(summary = "Update your user account fully", responses = {
       @ApiResponse(responseCode = "200"),
       @ApiResponse(responseCode = "400", content = @Content),
-      @ApiResponse(responseCode = "403", content = @Content),
       @ApiResponse(responseCode = "404", content = @Content)
   })
   public ResponseEntity<UserDto> fullUpdateSelf(@RequestBody @Valid UserCreationDto userDto,
@@ -92,10 +88,8 @@ public class UserController {
   }
 
   @DeleteMapping("/self")
-  @Operation(summary = "Delete your user account", responses = {
-      @ApiResponse(responseCode = "204", content = @Content),
-      @ApiResponse(responseCode = "403", content = @Content),
-  })
+  @Operation(summary = "Delete your user account",
+      responses = @ApiResponse(responseCode = "204", content = @Content))
   public ResponseEntity<Void> deleteSelf(Principal principal) {
     userService.deleteByUsername(principal.getName());
     return ResponseEntity.noContent().build();
